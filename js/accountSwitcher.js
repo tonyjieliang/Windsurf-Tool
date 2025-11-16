@@ -444,7 +444,7 @@ class AccountSwitcher {
       await this.writeToDB(sessionsKey, encrypted);
       log('[切号] ✅ sessions 写入成功');
       
-      // 9. 写入 windsurfAuthStatus
+      // 9. 写入 windsurfAuthStatus（账号状态）
       log('[切号] 正在写入 windsurfAuthStatus...');
       const authStatus = {
         name: name,
@@ -456,17 +456,20 @@ class AccountSwitcher {
       await this.writeToDB('windsurfAuthStatus', authStatus);
       log('[切号] ✅ windsurfAuthStatus 写入成功');
       
-      // 10. (可选) 写入 api_server_url
-      if (apiServerUrl) {
-        log('[切号] 正在写入 api_server_url...');
-        const codeiumConfig = {
-          "codeium.installationId": uuidv4(),
-          "apiServerUrl": apiServerUrl,
-          "codeium.hasOneTimeUpdatedUnspecifiedMode": true
-        };
-        await this.writeToDB('codeium.windsurf', codeiumConfig);
-        log('[切号] ✅ api_server_url 写入成功');
-      }
+      // 10. 写入 codeium.windsurf 配置
+      log('[切号] 正在写入 codeium.windsurf 配置...');
+      const codeiumConfig = {
+        "codeium.installationId": uuidv4(),
+        "apiServerUrl": apiServerUrl || "https://server.self-serve.windsurf.com",
+        "codeium.hasOneTimeUpdatedUnspecifiedMode": true
+      };
+      await this.writeToDB('codeium.windsurf', codeiumConfig);
+      log('[切号] ✅ codeium.windsurf 配置写入成功');
+      
+      // 11. 写入 codeium.windsurf-windsurf_auth（用户名）
+      log('[切号] 正在写入用户名...');
+      await this.writeToDB('codeium.windsurf-windsurf_auth', name);
+      log('[切号] ✅ 用户名写入成功');
       
       log('[切号] ========== 切换账号成功 ==========');
       log(`[切号] 当前账号: ${account.email}`);
