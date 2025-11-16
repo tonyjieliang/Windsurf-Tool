@@ -233,7 +233,7 @@ class WindsurfPathDetector {
  */
 class AccountSwitcher {
   /**
-   * 使用 refresh_token 获取 access_token
+   * 使用 refresh_token 获取 access_token（通过 Cloudflare Workers 中转）
    */
   static async getAccessToken(refreshToken) {
     const axios = require('axios');
@@ -243,8 +243,11 @@ class AccountSwitcher {
     formData.append('grant_type', 'refresh_token');
     formData.append('refresh_token', refreshToken);
     
+    // 使用 Cloudflare Workers 中转（国内可访问）
+    const WORKER_URL = 'https://windsurf.crispvibe.cn';
+    
     const response = await axios.post(
-      `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`,
+      `${WORKER_URL}/token?key=${FIREBASE_API_KEY}`,
       formData.toString(),
       {
         headers: {
