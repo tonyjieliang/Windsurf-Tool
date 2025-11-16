@@ -209,20 +209,29 @@ function handleDomainInputKeyPress(event) {
 
 async function addDomain() {
   const input = document.getElementById('domainInput');
-  if (!input) return;
+  if (!input) {
+    console.error('❌ 找不到域名输入框元素');
+    alert('系统错误：找不到输入框');
+    return;
+  }
   
-  const domain = input.value.trim();
+  const domain = input.value ? input.value.trim() : '';
   if (!domain) {
     alert('请输入域名');
     return;
   }
   
-  const result = await DomainManager.addDomain(domain);
-  if (result.success) {
-    input.value = '';
-    input.focus();
-  } else {
-    alert(result.message);
+  try {
+    const result = await DomainManager.addDomain(domain);
+    if (result.success) {
+      input.value = '';
+      input.focus();
+    } else {
+      alert(result.message || '添加域名失败');
+    }
+  } catch (error) {
+    console.error('❌ 添加域名时发生错误:', error);
+    alert('发生错误: ' + error.message);
   }
 }
 
